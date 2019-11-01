@@ -25,8 +25,8 @@ class Fluid:
         self.velo0 = np.full((self.size, self.size, 2), 0, dtype=float)
 
     def step(self):
-        self.diffuse(1, self.velo0[:, :, 0], self.velo[:, :, 0], self.visc, self.dt)  # x axis
-        self.diffuse(2, self.velo0[:, :, 1], self.velo[:, :, 1], self.visc, self.dt)  # y axis
+        self.diffuse(1, self.velo0[:, :, 0], self.velo[:, :, 0], self.visc)  # x axis
+        self.diffuse(2, self.velo0[:, :, 1], self.velo[:, :, 1], self.visc)  # y axis
 
         # x0, y0, x, y
         self.project(self.velo0[:, :, 0], self.velo0[:, :, 1], self.velo[:, :, 0], self.velo[:, :, 1])
@@ -36,7 +36,7 @@ class Fluid:
 
         self.project(self.velo[:, :, 0], self.velo[:, :, 1], self.velo0[:, :, 0], self.velo0[:, :, 1])
 
-        self.diffuse(0, self.s, self.density, self.diff, self.dt)
+        self.diffuse(0, self.s, self.density, self.diff)
         self.advect(0, self.density, self.s, self.velo[:, :, 0], self.velo[:, :, 1])
 
     def lin_solve(self, b, x, x0, a, c):
@@ -70,8 +70,8 @@ class Fluid:
         table[self.size - 1, self.size - 1] = 0.5 * table[self.size - 2, self.size - 1]\
                                               + table[self.size - 1, self.size - 2]
 
-    def diffuse(self, b, x, x0, diff, dt):
-        a = dt * diff * (self.size - 2) * (self.size - 2)
+    def diffuse(self, b, x, x0, diff):
+        a = self.dt * diff * (self.size - 2) * (self.size - 2)
         self.lin_solve(b, x, x0, a, 1 + 6 * a)
 
     def project(self, velo_x, velo_y, p, div):
