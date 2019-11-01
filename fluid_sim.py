@@ -11,7 +11,6 @@ class Fluid:
 
     def __init__(self):
         self.size = 40  # map size
-        self.dt = 0.2  # time interval
         self.iter = 2  # linear equation solving iteration number
 
         self.diff = 0.0000
@@ -69,7 +68,7 @@ class Fluid:
                                               + table[self.size - 1, self.size - 2]
 
     def diffuse(self, x, x0, diff):
-        a = self.dt * diff * (self.size - 2) * (self.size - 2)
+        a = diff * (self.size - 2) * (self.size - 2)
         self.lin_solve(x, x0, a, 1 + 6 * a)
 
     def project(self, velo_x, velo_y, p, div):
@@ -94,16 +93,11 @@ class Fluid:
         self.set_boundaries(self.velo)
 
     def advect(self, d, d0, velocity):
-        dtx = self.dt * (self.size - 2)
-        dty = self.dt * (self.size - 2)
 
         for j in range(1, self.size - 1):
             for i in range(1, self.size - 1):
-
-                tmp1 = dtx * velocity[i, j, 0]
-                tmp2 = dty * velocity[i, j, 1]
-                x = i - tmp1
-                y = j - tmp2
+                x = i - velocity[i, j, 0]
+                y = j - velocity[i, j, 1]
 
                 if x < 0.5: x = 0.5
                 if x > self.size + 0.5: x = self.size + 0.5
@@ -141,7 +135,7 @@ if __name__ == "__main__":
 
     for step in range(0, frames):
         flu.density[4:7, 4:7] += 100  # add density into a 3*3 square
-        flu.velo[5, 5] += [1, 2]
+        flu.velo[5, 5] += np.array([1, 1]) * 9
 
         flu.step()
         video[step] = flu.density
