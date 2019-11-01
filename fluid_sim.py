@@ -30,13 +30,14 @@ class Fluid:
         # x0, y0, x, y
         self.project(self.velo0[:, :, 0], self.velo0[:, :, 1], self.velo[:, :, 0], self.velo[:, :, 1])
 
-        self.advect(self.velo[:, :, 0], self.velo0[:, :, 0], self.velo0[:, :, 0], self.velo0[:, :, 1])
-        self.advect(self.velo[:, :, 1], self.velo0[:, :, 1], self.velo0[:, :, 0], self.velo0[:, :, 1])
+        self.advect(self.velo[:, :, 0], self.velo0[:, :, 0], self.velo0)
+        self.advect(self.velo[:, :, 1], self.velo0[:, :, 1], self.velo0)
 
         self.project(self.velo[:, :, 0], self.velo[:, :, 1], self.velo0[:, :, 0], self.velo0[:, :, 1])
 
         self.diffuse(self.s, self.density, self.diff)
-        self.advect(self.density, self.s, self.velo[:, :, 0], self.velo[:, :, 1])
+
+        self.advect(self.density, self.s, self.velo)
 
     def lin_solve(self, x, x0, a, c):
         c_recip = 1 / c
@@ -95,15 +96,15 @@ class Fluid:
 
         self.set_boundaries(self.velo)
 
-    def advect(self, d, d0, velo_x, velo_y):
+    def advect(self, d, d0, velocity):
         dtx = self.dt * (self.size - 2)
         dty = self.dt * (self.size - 2)
 
         for j in range(1, self.size - 1):
             for i in range(1, self.size - 1):
 
-                tmp1 = dtx * velo_x[i, j]
-                tmp2 = dty * velo_y[i, j]
+                tmp1 = dtx * velocity[i, j, 0]
+                tmp2 = dty * velocity[i, j, 1]
                 x = i - tmp1
                 y = j - tmp2
 
