@@ -43,9 +43,7 @@ class Fluid:
         c_recip = 1 / c
 
         for iteration in range(0, self.iter):
-            for j in range(1, self.size - 1):
-                for i in range(1, self.size - 1):
-                    x[i, j] = (x0[i, j] + a * (x[i + 1, j] + x[i - 1, j] + x[i, j + 1] + x[i, j - 1])) * c_recip
+            x[1:-1, 1:-1] = (x0[1:-1, 1:-1] + a * (x[2:, 1:-1] + x[:-2, 1:-1] + x[1:-1, 2:] + x[1:-1, :-2])) * c_recip
 
             self.set_boundaries(x)
 
@@ -75,24 +73,23 @@ class Fluid:
         self.lin_solve(x, x0, a, 1 + 6 * a)
 
     def project(self, velo_x, velo_y, p, div):
-        for j in range(1, self.size - 1):
-            for i in range(1, self.size - 1):
-                div[i, j] = -0.5 * (
-                        velo_x[i + 1, j] -
-                        velo_x[i - 1, j] +
-                        velo_y[i, j + 1] -
-                        velo_y[i, j - 1]) / self.size
 
-                p[i, j] = 0
+        # numpy equivalent to this in a for loop:
+        # div[i, j] = -0.5 * (velo_x[i + 1, j] - velo_x[i - 1, j] + velo_y[i, j + 1] - velo_y[i, j - 1]) / self.size
+        div[1:-1, 1:-1] = -0.5 * (
+                velo_x[2:, 1:-1] -
+                velo_x[:-2, 1:-1] +
+                velo_y[1:-1, 2:] -
+                velo_y[1:-1, :-2]) \
+                          / self.size
+        p[:, :] = 0
 
         self.set_boundaries(div)
         self.set_boundaries(p)
         self.lin_solve(p, div, 1, 6)
 
-        for j in range(1, self.size - 1):
-            for i in range(1, self.size - 1):
-                velo_x[i, j] -= 0.5 * (p[i + 1, j] - p[i - 1, j]) * self.size
-                velo_y[i, j] -= 0.5 * (p[i, j + 1] - p[i, j - 1]) * self.size
+        velo_x[1:-1, 1:-1] -= 0.5 * (p[2:, 1:-1] - p[:-2, 1:-1]) * self.size
+        velo_y[1:-1, 1:-1] -= 0.5 * (p[1:-1, 2:] - p[1:-1, :-2]) * self.size
 
         self.set_boundaries(self.velo)
 
