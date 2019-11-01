@@ -25,21 +25,20 @@ class Fluid:
         self.velo0 = np.full((self.size, self.size, 2), 0, dtype=float)
 
     def step(self):
-        self.diffuse(1, self.velo0[:, :, 0], self.velo[:, :, 0], self.visc)  # x axis
-        self.diffuse(2, self.velo0[:, :, 1], self.velo[:, :, 1], self.visc)  # y axis
+        self.diffuse(self.velo0, self.velo, self.visc)  # x axis
 
         # x0, y0, x, y
         self.project(self.velo0[:, :, 0], self.velo0[:, :, 1], self.velo[:, :, 0], self.velo[:, :, 1])
 
-        self.advect(1, self.velo[:, :, 0], self.velo0[:, :, 0], self.velo0[:, :, 0], self.velo0[:, :, 1])
-        self.advect(2, self.velo[:, :, 1], self.velo0[:, :, 1], self.velo0[:, :, 0], self.velo0[:, :, 1])
+        self.advect(self.velo[:, :, 0], self.velo0[:, :, 0], self.velo0[:, :, 0], self.velo0[:, :, 1])
+        self.advect(self.velo[:, :, 1], self.velo0[:, :, 1], self.velo0[:, :, 0], self.velo0[:, :, 1])
 
         self.project(self.velo[:, :, 0], self.velo[:, :, 1], self.velo0[:, :, 0], self.velo0[:, :, 1])
 
-        self.diffuse(0, self.s, self.density, self.diff)
-        self.advect(0, self.density, self.s, self.velo[:, :, 0], self.velo[:, :, 1])
+        self.diffuse(self.s, self.density, self.diff)
+        self.advect(self.density, self.s, self.velo[:, :, 0], self.velo[:, :, 1])
 
-    def lin_solve(self, b, x, x0, a, c):
+    def lin_solve(self, x, x0, a, c):
         c_recip = 1 / c
 
         for iteration in range(0, self.iter):
@@ -47,32 +46,32 @@ class Fluid:
                 for i in range(1, self.size - 1):
                     x[i, j] = (x0[i, j] + a * (x[i + 1, j] + x[i - 1, j] + x[i, j + 1] + x[i, j - 1])) * c_recip
 
-            self.set_boundaries(b, x)
+            self.set_boundaries(x)
 
-    def set_boundaries(self, b, table):
+    def set_boundaries(self, table):
         """
         Boundaries handling
         :return:
         """
 
-        # vertical
-        table[:, 0] = - table[:, 0] if b == 2 else table[:, 0]
-        table[:, self.size-1] = - table[:, self.size-1] if b == 2 else table[:, self.size-1]
+        if len(table.shape) > 2:  # 3d velocity vector array
+            # vertical, invert if y vector
+            table[:, 0, 1] = - table[:, 0, 1]
+            table[:, self.size - 1, 1] = - table[:, self.size - 1, 1]
 
-        # horizontal
-        table[0, :] = - table[0, :] if b == 1 else table[0, :]
-        table[self.size - 1, :] = - table[self.size - 1, :] if b == 1 else table[self.size - 1, :]
+            # horizontal, invert if x vector
+            table[0, :, 0] = - table[0, :, 0]
+            table[self.size - 1, :, 0] = - table[self.size - 1, :, 0]
 
-        # corners
         table[0, 0] = 0.5 * (table[1, 0] + table[0, 1])
         table[0, self.size - 1] = 0.5 * (table[1, self.size - 1] + table[0, self.size - 2])
         table[self.size - 1, 0] = 0.5 * (table[self.size - 2, 0] + table[self.size - 1, 1])
         table[self.size - 1, self.size - 1] = 0.5 * table[self.size - 2, self.size - 1]\
                                               + table[self.size - 1, self.size - 2]
 
-    def diffuse(self, b, x, x0, diff):
+    def diffuse(self, x, x0, diff):
         a = self.dt * diff * (self.size - 2) * (self.size - 2)
-        self.lin_solve(b, x, x0, a, 1 + 6 * a)
+        self.lin_solve(x, x0, a, 1 + 6 * a)
 
     def project(self, velo_x, velo_y, p, div):
         for j in range(1, self.size - 1):
@@ -85,19 +84,18 @@ class Fluid:
 
                 p[i, j] = 0
 
-        self.set_boundaries(0, div)
-        self.set_boundaries(0, p)
-        self.lin_solve(0, p, div, 1, 6)
+        self.set_boundaries(div)
+        self.set_boundaries(p)
+        self.lin_solve(p, div, 1, 6)
 
         for j in range(1, self.size - 1):
             for i in range(1, self.size - 1):
                 velo_x[i, j] -= 0.5 * (p[i + 1, j] - p[i - 1, j]) * self.size
                 velo_y[i, j] -= 0.5 * (p[i, j + 1] - p[i, j - 1]) * self.size
 
-        self.set_boundaries(1, velo_x)
-        self.set_boundaries(2, velo_y)
+        self.set_boundaries(self.velo)
 
-    def advect(self, b, d, d0, velo_x, velo_y):
+    def advect(self, d, d0, velo_x, velo_y):
         dtx = self.dt * (self.size - 2)
         dty = self.dt * (self.size - 2)
 
@@ -132,7 +130,7 @@ class Fluid:
                 d[i, j] = s0 * (t0 * d0[i0i, j0i] + t1 * d0[i0i, j1i]) + \
                           s1 * (t0 * d0[i1i, j0i] + t1 * d0[i1i, j1i])
 
-        self.set_boundaries(b, d)
+        self.set_boundaries(d)
 
 
 if __name__ == "__main__":
