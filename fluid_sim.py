@@ -25,7 +25,7 @@ class Fluid:
         self.velo0 = np.full((self.size, self.size, 2), 0, dtype=float)
 
     def step(self):
-        self.diffuse(self.velo0, self.velo, self.visc)  # x axis
+        self.diffuse(self.velo0, self.velo, self.visc)
 
         # x0, y0, x, y
         self.project(self.velo0[:, :, 0], self.velo0[:, :, 1], self.velo[:, :, 0], self.velo[:, :, 1])
