@@ -69,8 +69,11 @@ class Fluid:
                                               + table[self.size - 1, self.size - 2]
 
     def diffuse(self, x, x0, diff):
-        a = self.dt * diff * (self.size - 2) * (self.size - 2)
-        self.lin_solve(x, x0, a, 1 + 6 * a)
+        if diff != 0:
+            a = self.dt * diff * (self.size - 2) * (self.size - 2)
+            self.lin_solve(x, x0, a, 1 + 6 * a)
+        else:  # equivalent to lin_solve with a = 0
+            x[:, :] = x0[:, :]
 
     def project(self, velo_x, velo_y, p, div):
 
