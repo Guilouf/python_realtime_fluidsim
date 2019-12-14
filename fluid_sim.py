@@ -145,12 +145,18 @@ if __name__ == "__main__":
             inst.density[4:7, 4:7] += 100  # add density into a 3*3 square
             inst.velo[5, 5] += [1, 2]
             inst.step()
-            im.set_array(np.atleast_2d(inst.density))
+            im.set_array(inst.density)
+            q.set_UVC(inst.velo[:, :, 1], inst.velo[:, :, 0])
             print(f"Density sum: {inst.density.sum()}")
             # im.autoscale()
 
         fig = plt.figure()
-        im = plt.imshow(np.atleast_2d(inst.density), cmap='hot', vmax=100, interpolation='bilinear')
+
+        # plot density
+        im = plt.imshow(inst.density, cmap='hot', vmax=100, interpolation='bilinear')
+
+        # plot vector field
+        q = plt.quiver(inst.velo[:, :, 1], inst.velo[:, :, 0], scale=10, angles='xy')
         anim = animation.FuncAnimation(fig, update_im, interval=0)
         plt.show()
 
