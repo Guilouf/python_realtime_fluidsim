@@ -53,14 +53,27 @@ class Fluid:
         """
 
         if len(table.shape) > 2:  # 3d velocity vector array
-            # vertical, invert if y vector
-            table[:, 0, 1] = - table[:, 0, 1]
-            table[:, self.size - 1, 1] = - table[:, self.size - 1, 1]
+            # vertical borders
+            table[:, 0, 0] = table[:, 1, 0]
+            table[:, 0, 1] = - table[:, 1, 1]
+            table[:, self.size - 1, 0] = table[:, self.size - 2, 0]
+            table[:, self.size - 1, 1] = - table[:, self.size - 2, 1]
 
-            # horizontal, invert if x vector
-            table[0, :, 0] = - table[0, :, 0]
-            table[self.size - 1, :, 0] = - table[self.size - 1, :, 0]
+            # horizontal borders
+            table[0, :, 0] = - table[1, :, 0]
+            table[0, :, 1] = table[1, :, 1]
+            table[self.size - 1, :, 0] = - table[self.size - 2, :, 0]
+            table[self.size - 1, :, 1] = table[self.size - 2, :, 1]
 
+        else:
+            table[:, 0] = table[:, 1]
+            table[:, self.size - 1] = table[:, self.size - 2]
+
+            table[0, :] = - table[1, :]
+            table[self.size - 1, :] = table[self.size - 2, :]
+
+
+        # corners
         table[0, 0] = 0.5 * (table[1, 0] + table[0, 1])
         table[0, self.size - 1] = 0.5 * (table[1, self.size - 1] + table[0, self.size - 2])
         table[self.size - 1, 0] = 0.5 * (table[self.size - 2, 0] + table[self.size - 1, 1])
@@ -156,7 +169,7 @@ if __name__ == "__main__":
         im = plt.imshow(inst.density, cmap='hot', vmax=100, interpolation='bilinear')
 
         # plot vector field
-        q = plt.quiver(inst.velo[:, :, 1], inst.velo[:, :, 0], scale=10, angles='xy')
+        q = plt.quiver(inst.velo[:, :, 1], inst.velo[:, :, 0], scale=10, angles='xy', color='w')
         anim = animation.FuncAnimation(fig, update_im, interval=0)
         plt.show()
 
