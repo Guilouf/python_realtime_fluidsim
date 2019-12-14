@@ -14,7 +14,7 @@ class Fluid:
         self.dt = 0.2  # time interval
         self.iter = 2  # linear equation solving iteration number
 
-        self.diff = 0.0000
+        self.diff = 0.0000  # Diffusion
         self.visc = 0.0000  # viscosity
 
         self.s = np.full((self.size, self.size), 0, dtype=float)
