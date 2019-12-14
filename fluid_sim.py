@@ -4,7 +4,6 @@ and the mike ash vulgarization https://mikeash.com/pyblog/fluid-simulation-for-d
 """
 import numpy as np
 import math
-import imageio
 
 
 class Fluid:
@@ -135,18 +134,40 @@ class Fluid:
 
 
 if __name__ == "__main__":
+    try:
+        import matplotlib.pyplot as plt
+        from matplotlib import animation
 
-    frames = 30
+        inst = Fluid()
 
-    flu = Fluid()
 
-    video = np.full((frames, flu.size, flu.size), 0, dtype=float)
+        def update_im(i):
+            inst.density[4:7, 4:7] += 100  # add density into a 3*3 square
+            inst.velo[5, 5] += [1, 2]
+            inst.step()
+            im.set_array(np.atleast_2d(inst.density))
+            print(f"Density sum: {inst.density.sum()}")
+            # im.autoscale()
 
-    for step in range(0, frames):
-        flu.density[4:7, 4:7] += 100  # add density into a 3*3 square
-        flu.velo[5, 5] += [1, 2]
+        fig = plt.figure()
+        im = plt.imshow(np.atleast_2d(inst.density), cmap='hot', vmax=100, interpolation='bilinear')
+        anim = animation.FuncAnimation(fig, update_im, interval=0)
+        plt.show()
 
-        flu.step()
-        video[step] = flu.density
+    except ImportError:
+        import imageio
 
-    imageio.mimsave('./video.gif', video.astype('uint8'))
+        frames = 30
+
+        flu = Fluid()
+
+        video = np.full((frames, flu.size, flu.size), 0, dtype=float)
+
+        for step in range(0, frames):
+            flu.density[4:7, 4:7] += 100  # add density into a 3*3 square
+            flu.velo[5, 5] += [1, 2]
+
+            flu.step()
+            video[step] = flu.density
+
+        imageio.mimsave('./video.gif', video.astype('uint8'))
