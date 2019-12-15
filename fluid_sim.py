@@ -53,7 +53,7 @@ class Fluid:
 
     def set_boundaries(self, table):
         """
-        Boundaries handling
+        Boundaries handling. For density, border reflection may affect the total density sum
         :return:
         """
 
@@ -61,29 +61,28 @@ class Fluid:
             # vertical borders
             table[:, 0, 0] = table[:, 1, 0]
             table[:, 0, 1] = - table[:, 1, 1]
-            table[:, self.size - 1, 0] = table[:, self.size - 2, 0]
-            table[:, self.size - 1, 1] = - table[:, self.size - 2, 1]
+            table[:, -1, 0] = table[:, -2, 0]
+            table[:, -1, 1] = - table[:, -2, 1]
 
             # horizontal borders
             table[0, :, 0] = - table[1, :, 0]
             table[0, :, 1] = table[1, :, 1]
-            table[self.size - 1, :, 0] = - table[self.size - 2, :, 0]
-            table[self.size - 1, :, 1] = table[self.size - 2, :, 1]
+            table[-1, :, 0] = - table[-2, :, 0]
+            table[-1, :, 1] = table[-2, :, 1]
 
         else:
             table[:, 0] = table[:, 1]
-            table[:, self.size - 1] = table[:, self.size - 2]
+            table[:, -1] = table[:, -2]
 
-            table[0, :] = - table[1, :]
-            table[self.size - 1, :] = table[self.size - 2, :]
+            table[0, :] = table[1, :]
+            table[-1, :] = table[-2, :]
 
 
         # corners
         table[0, 0] = 0.5 * (table[1, 0] + table[0, 1])
-        table[0, self.size - 1] = 0.5 * (table[1, self.size - 1] + table[0, self.size - 2])
-        table[self.size - 1, 0] = 0.5 * (table[self.size - 2, 0] + table[self.size - 1, 1])
-        table[self.size - 1, self.size - 1] = 0.5 * table[self.size - 2, self.size - 1]\
-                                              + table[self.size - 1, self.size - 2]
+        table[0, -1] = 0.5 * (table[1, -1] + table[0, -2])
+        table[-1, 0] = 0.5 * (table[-2, 0] + table[- 1, 1])
+        table[-1, -1] = 0.5 * (table[-2, -1] + table[-1, -2])
 
     def diffuse(self, x, x0, diff):
         if diff != 0:
