@@ -23,6 +23,11 @@ class Fluid:
         self.velo = np.full((self.size, self.size, 2), 0, dtype=float)
         self.velo0 = np.full((self.size, self.size, 2), 0, dtype=float)
 
+    @property
+    def total_density(self):
+        """Gives the total density amount, ignoring boundaries corrections"""
+        return self.density[1:-1, 1:-1].sum()
+
     def step(self):
         self.diffuse(self.velo0, self.velo, self.visc)
 
