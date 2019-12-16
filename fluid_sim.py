@@ -28,6 +28,18 @@ class Fluid:
         """Gives the total density amount, ignoring boundaries corrections"""
         return self.density[1:-1, 1:-1].sum()
 
+    @property
+    def vector_divergence(self):
+        """Compute vector divergence by pixel: (left - right) * x_component + (top - down) * y_component"""
+        divergence_map = np.full((self.size, self.size), 0, dtype=float)
+        for x in range(1, self.size-2):
+            for y in range(1, self.size-2):
+                velocity_window = self.velo[y-1:y+2, x-1:x+2]
+                divergence_map[y, x] = (np.gradient(velocity_window[:, :, 0], axis=0) +
+                                        np.gradient(velocity_window[:, :, 1], axis=1)).sum()
+
+        return divergence_map
+
     def step(self):
         self.diffuse(self.velo0, self.velo, self.visc)
 
