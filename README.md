@@ -18,6 +18,6 @@ and the mike ash vulgarization https://mikeash.com/pyblog/fluid-simulation-for-d
 - For pycharm users, enable 
     ```       
     import matplotlib
-    matplotlib.use('Qt5Agg')
+    matplotlib.use('Qt5Agg')  # or 'TkAgg' or whatever works
     ```
     to disable the matplotlib view pycharm feature
