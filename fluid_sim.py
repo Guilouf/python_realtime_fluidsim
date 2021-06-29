@@ -94,6 +94,12 @@ class Fluid:
             table[0, :] = table[1, :]
             table[-1, :] = table[-2, :]
 
+        #  pass through boundaries (loop over walls)
+        # table[:, 0] = table[:, -2]
+        # table[:, -1] = table[:, 1]
+        #
+        # table[0, :] = table[-2, :]
+        # table[-1, :] = table[1, :]
 
         # corners
         table[0, 0] = 0.5 * (table[1, 0] + table[0, 1])
