@@ -40,6 +40,11 @@ class Fluid:
 
         return divergence_map
 
+    @property
+    def total_divergence(self):
+        """Sum of the absolute divergence value"""
+        return np.abs(self.vector_divergence).sum()
+
     def step(self):
         self.diffuse(self.velo0, self.velo, self.visc)
 
@@ -185,7 +190,11 @@ if __name__ == "__main__":
             inst.step()
             im.set_array(inst.density)
             q.set_UVC(inst.velo[:, :, 1], inst.velo[:, :, 0])
-            print(f"Density sum: {inst.density.sum()}")
+
+            # ! slows down processing if enabled
+            # print(f"Density sum: {inst.total_density:.2f}, Total divergence: {inst.total_divergence:.2f}")
+
+            # auto adjust heatmap "brightness"
             # im.autoscale()
 
         fig = plt.figure()
