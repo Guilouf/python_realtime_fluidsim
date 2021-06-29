@@ -11,7 +11,7 @@ class Fluid:
     def __init__(self):
         self.size = 40  # map size
         self.dt = 0.2  # time interval
-        self.iter = 2  # linear equation solving iteration number
+        self.iter = 8  # linear equation solving iteration number
 
         self.diff = 0.0000  # Diffusion
         self.visc = 0.0000  # viscosity
@@ -125,6 +125,7 @@ class Fluid:
         self.set_boundaries(self.velo)
 
     def advect(self, d, d0, velocity):
+        """Basically move elements forward in time"""
         dtx = self.dt * (self.size - 2)
         dty = self.dt * (self.size - 2)
 
@@ -136,13 +137,17 @@ class Fluid:
                 x = i - tmp1
                 y = j - tmp2
 
-                if x < 0.5: x = 0.5
-                if x > self.size + 0.5: x = self.size + 0.5
+                if x < 0.5:
+                    x = 0.5
+                if x > self.size + 0.5:
+                    x = self.size + 0.5
                 i0 = math.floor(x)
                 i1 = i0 + 1.0
 
-                if y < 0.5: y = 0.5
-                if y > self.size + 0.5: y = self.size + 0.5
+                if y < 0.5:
+                    y = 0.5
+                if y > self.size + 0.5:
+                    y = self.size + 0.5
                 j0 = math.floor(y)
                 j1 = j0 + 1.0
 
@@ -185,7 +190,7 @@ if __name__ == "__main__":
 
         fig = plt.figure()
 
-        # plot density
+        # plot density (set interpolation to none for raw view)
         im = plt.imshow(inst.density, cmap='hot', vmax=100, interpolation='bilinear')
 
         # plot vector field
