@@ -179,54 +179,35 @@ class Fluid:
 
 
 if __name__ == "__main__":
-    try:
-        import matplotlib.pyplot as plt
-        from matplotlib import animation
+    import matplotlib.pyplot as plt
+    from matplotlib import animation
 
-        # Enable for pycharm users
-        # import matplotlib
-        # matplotlib.use('Qt5Agg')
+    # Enable for pycharm users
+    # import matplotlib
+    # matplotlib.use('Qt5Agg')
 
-        inst = Fluid()
+    inst = Fluid()
 
 
-        def update_im(i):
-            inst.density[4:7, 4:7] += 100  # add density into a 3*3 square
-            inst.velo[5, 5] += [1, 2]
-            inst.step()
-            im.set_array(inst.density)
-            q.set_UVC(inst.velo[:, :, 1], inst.velo[:, :, 0])
+    def update_im(i):
+        inst.density[4:7, 4:7] += 100  # add density into a 3*3 square
+        inst.velo[5, 5] += [1, 2]
+        inst.step()
+        im.set_array(inst.density)
+        q.set_UVC(inst.velo[:, :, 1], inst.velo[:, :, 0])
 
-            # ! slows down processing if enabled
-            # print(f"Density sum: {inst.total_density:.2f}, Total divergence: {inst.total_divergence:.2f}")
+        # ! slows down processing if enabled
+        # print(f"Density sum: {inst.total_density:.2f}, Total divergence: {inst.total_divergence:.2f}")
 
-            # auto adjust heatmap "brightness"
-            # im.autoscale()
+        # auto adjust heatmap "brightness"
+        # im.autoscale()
 
-        fig = plt.figure()
+    fig = plt.figure()
 
-        # plot density (set interpolation to none for raw view)
-        im = plt.imshow(inst.density, cmap='hot', vmax=100, interpolation='bilinear')
+    # plot density (set interpolation to none for raw view)
+    im = plt.imshow(inst.density, cmap='hot', vmax=100, interpolation='bilinear')
 
-        # plot vector field
-        q = plt.quiver(inst.velo[:, :, 1], inst.velo[:, :, 0], scale=10, angles='xy', color='w')
-        anim = animation.FuncAnimation(fig, update_im, interval=0)
-        plt.show()
-
-    except ImportError:
-        import imageio
-
-        frames = 30
-
-        flu = Fluid()
-
-        video = np.full((frames, flu.size, flu.size), 0, dtype=float)
-
-        for step in range(0, frames):
-            flu.density[4:7, 4:7] += 100  # add density into a 3*3 square
-            flu.velo[5, 5] += [1, 2]
-
-            flu.step()
-            video[step] = flu.density
-
-        imageio.mimsave('./video.gif', video.astype('uint8'))
+    # plot vector field
+    q = plt.quiver(inst.velo[:, :, 1], inst.velo[:, :, 0], scale=10, angles='xy', color='w')
+    anim = animation.FuncAnimation(fig, update_im, interval=0)
+    plt.show()

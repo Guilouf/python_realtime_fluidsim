@@ -5,7 +5,12 @@ and the mike ash vulgarization https://mikeash.com/pyblog/fluid-simulation-for-d
 
 ## Install
 
-`pip install -r requirements.txt` and then run the `fluid_sim.py` script
+`pip install -r requirements.txt`
+
+# Run
+
+- `python3 fluid_sim.py` to run matplotlib animation
+- `python3 to_gif.py` to export as an animated GIF
 
 
 ## Issues
