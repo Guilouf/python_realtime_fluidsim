@@ -6,3 +6,13 @@ and the mike ash vulgarization https://mikeash.com/pyblog/fluid-simulation-for-d
 ## Install
 
 `pip install -r requirements.txt` and then run the `fluid_sim.py` script
+
+
+## Issues
+
+- For pycharm users, enable 
+    ```       
+    import matplotlib
+    matplotlib.use('Qt5Agg')
+    ```
+    to disable the matplotlib view pycharm feature

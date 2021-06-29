@@ -167,6 +167,10 @@ if __name__ == "__main__":
         import matplotlib.pyplot as plt
         from matplotlib import animation
 
+        # Enable for pycharm users
+        # import matplotlib
+        # matplotlib.use('Qt5Agg')
+
         inst = Fluid()
 
 
