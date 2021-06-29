@@ -194,6 +194,7 @@ if __name__ == "__main__":
         inst.velo[5, 5] += [1, 2]
         inst.step()
         im.set_array(inst.density)
+        # update vector field data
         q.set_UVC(inst.velo[:, :, 1], inst.velo[:, :, 0])
 
         # ! slows down processing if enabled
